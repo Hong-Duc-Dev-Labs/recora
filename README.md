@@ -18,7 +18,7 @@
 - ⚡ Quick Settings tile that starts and stops recording without opening the app
 - 🎞️ Library with a preview, recording time, and swipe-to-reveal share and delete
 
-The interface text is Vietnamese.
+The interface is available in English and Vietnamese and follows the device language. Android 13 and newer also list both under Settings > Apps > Recora > Language.
 
 ## 📥 Download
 
