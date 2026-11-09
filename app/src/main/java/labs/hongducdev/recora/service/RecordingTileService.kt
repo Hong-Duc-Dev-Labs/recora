@@ -1,5 +1,6 @@
 package labs.hongducdev.recora.service
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.drawable.Icon
@@ -52,6 +53,8 @@ class RecordingTileService : TileService() {
         return status == RecordingStatus.RECORDING || status == RecordingStatus.PAUSED
     }
 
+    // The Intent overload is only reached below API 34, where the PendingIntent overload does not exist.
+    @SuppressLint("StartActivityAndCollapseDeprecated")
     private fun launchRecordingRequest() {
         val intent =
             Intent(this, RecordingStartActivity::class.java).apply {
