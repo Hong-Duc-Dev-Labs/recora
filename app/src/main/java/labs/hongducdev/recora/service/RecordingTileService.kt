@@ -75,7 +75,8 @@ class RecordingTileService : TileService() {
     private fun renderTile() {
         val tile = qsTile ?: return
         val state = RecordingController.sessionState.value
-        tile.icon = Icon.createWithResource(this, R.drawable.ic_tile_record)
+        val recordingActive = state.status == RecordingStatus.RECORDING || state.status == RecordingStatus.PAUSED
+        tile.icon = Icon.createWithResource(this, if (recordingActive) R.drawable.ic_tile_stop else R.drawable.ic_tile_record)
         when (state.status) {
             RecordingStatus.RECORDING -> {
                 tile.state = Tile.STATE_ACTIVE

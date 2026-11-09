@@ -8,33 +8,40 @@ import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import labs.hongducdev.recora.model.AudioSourceType
+import labs.hongducdev.recora.model.RecordingConfig
 import labs.hongducdev.recora.service.RecordingController
+import labs.hongducdev.recora.ui.theme.RecoraTheme
 import labs.hongducdev.recora.utils.PreferenceManager
 
 /**
- * Invisible host for the system screen-capture consent dialog, used by the Quick Settings tile
- * so recording can start without bringing the app to the foreground.
+ * Transparent host for the system screen-capture consent dialog and the countdown, used by the
+ * Quick Settings tile so recording can start without bringing the app to the foreground.
  */
 class RecordingStartActivity : ComponentActivity() {
     private lateinit var prefManager: PreferenceManager
+    private val countdownNumber = mutableIntStateOf(0)
+    private var started = false
 
     private val projectionLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val data = result.data
             if (result.resultCode == RESULT_OK && data != null) {
-                startAfterCountdown(result.resultCode, data)
+                runCountdownThenStart(result.resultCode, data)
             } else {
                 Toast.makeText(this, "Đã hủy cấp quyền quay màn hình", Toast.LENGTH_SHORT).show()
-                finish()
+                close()
             }
         }
 
@@ -45,17 +52,29 @@ class RecordingStartActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Never swallow touches meant for the app underneath while the countdown runs.
-        window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         prefManager = PreferenceManager(this)
-        RecordingController.updateConfig(prefManager.getRecordingConfig())
+
+        setContent {
+            RecoraTheme(pitchBlackTheme = prefManager.pitchBlackTheme) {
+                if (countdownNumber.intValue > 0) CountdownDisplay(countdown = countdownNumber.intValue)
+            }
+        }
+
+        // Back during the permission dialog or countdown cancels the start.
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() = close()
+            },
+        )
+
         if (savedInstanceState != null) return
 
         val missing = mutableListOf<String>()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !isGranted(Manifest.permission.POST_NOTIFICATIONS)) {
             missing.add(Manifest.permission.POST_NOTIFICATIONS)
         }
-        if (prefManager.audioSource == AudioSourceType.MIC && !isGranted(Manifest.permission.RECORD_AUDIO)) {
+        if (usesMic(prefManager.audioSource) && !isGranted(Manifest.permission.RECORD_AUDIO)) {
             missing.add(Manifest.permission.RECORD_AUDIO)
         }
 
@@ -66,6 +85,8 @@ class RecordingStartActivity : ComponentActivity() {
         if (missing.isNotEmpty()) permissionsLauncher.launch(missing.toTypedArray()) else requestProjection()
     }
 
+    private fun usesMic(source: AudioSourceType) = source == AudioSourceType.MIC || source == AudioSourceType.MIC_AND_INTERNAL
+
     private fun isGranted(permission: String) =
         ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 
@@ -74,18 +95,49 @@ class RecordingStartActivity : ComponentActivity() {
         projectionLauncher.launch(manager.createScreenCaptureIntent())
     }
 
-    private fun startAfterCountdown(
+    /** Without microphone access the recorder would fail silently, so record without audio instead. */
+    private fun resolveConfig(): RecordingConfig {
+        val config = prefManager.getRecordingConfig()
+        if (usesMic(config.audioSource) && !isGranted(Manifest.permission.RECORD_AUDIO)) {
+            Toast.makeText(this, "Chưa cấp quyền micro nên video sẽ không có tiếng", Toast.LENGTH_LONG).show()
+            return config.copy(audioSource = AudioSourceType.MUTE)
+        }
+        return config
+    }
+
+    private fun runCountdownThenStart(
         resultCode: Int,
         data: Intent,
     ) {
-        val config = prefManager.getRecordingConfig()
+        val config = resolveConfig()
         lifecycleScope.launch {
             for (i in config.countdownSeconds downTo 1) {
-                Toast.makeText(this@RecordingStartActivity, i.toString(), Toast.LENGTH_SHORT).show()
+                countdownNumber.intValue = i
                 delay(1000)
             }
+            // Hide the number first so it never appears in the first recorded frames.
+            countdownNumber.intValue = 0
+            delay(150)
+
+            // A foreground service of type mediaProjection cannot be started safely from the
+            // background, so if the user left during the countdown the start is cancelled.
+            if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                Toast.makeText(this@RecordingStartActivity, "Đã hủy quay vì bạn rời khỏi màn hình", Toast.LENGTH_SHORT).show()
+                close()
+                return@launch
+            }
+            started = true
             RecordingController.startRecording(this@RecordingStartActivity, resultCode, data, config)
-            finish()
+            close()
         }
+    }
+
+    private fun close() {
+        if (isTaskRoot) finishAndRemoveTask() else finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (!started) countdownNumber.intValue = 0
     }
 }

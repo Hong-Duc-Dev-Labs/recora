@@ -60,6 +60,8 @@
             android:name=".RecordingStartActivity"
             android:exported="false"
             android:excludeFromRecents="true"
+            android:autoRemoveFromRecents="true"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:launchMode="singleInstance"
             android:taskAffinity=""
             android:theme="@style/Theme.Recora.Transparent" />

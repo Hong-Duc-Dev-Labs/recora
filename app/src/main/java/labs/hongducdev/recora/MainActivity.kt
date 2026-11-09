@@ -242,7 +242,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun CountdownDisplay(countdown: Int) {
+internal fun CountdownDisplay(countdown: Int) {
     Box(
         modifier =
             Modifier
