@@ -376,11 +376,14 @@ class ScreenRecordingService : Service() {
                 ).build()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(
-                NOTIFICATION_ID,
-                notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION,
-            )
+            // Without the microphone type Android silences mic capture once the app is in the background.
+            val config = RecordingController.config.value
+            val usesMic = config.audioSource == AudioSourceType.MIC || config.audioSource == AudioSourceType.MIC_AND_INTERNAL
+            val micGranted =
+                checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            var type = ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
+            if (usesMic && micGranted) type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+            startForeground(NOTIFICATION_ID, notification, type)
         } else {
             startForeground(NOTIFICATION_ID, notification)
         }
