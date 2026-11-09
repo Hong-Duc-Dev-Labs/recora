@@ -1,6 +1,8 @@
 package labs.hongducdev.recora.model
 
 import android.net.Uri
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 data class RecordedVideo(
@@ -20,6 +22,10 @@ data class RecordedVideo(
             val seconds = totalSeconds % 60
             return String.format(Locale.US, "%02d:%02d", minutes, seconds)
         }
+
+    /** Recording time in the device locale, e.g. 09/11/2026 22:03. */
+    val formattedDate: String
+        get() = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(dateAdded * 1000L))
 
     val formattedSize: String
         get() {
