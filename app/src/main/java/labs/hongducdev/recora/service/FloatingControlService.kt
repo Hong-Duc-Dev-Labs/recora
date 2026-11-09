@@ -11,6 +11,7 @@ import android.os.IBinder
 import android.provider.Settings
 import android.util.DisplayMetrics
 import android.view.Gravity
+import android.widget.FrameLayout
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.view.WindowManager
@@ -68,7 +69,7 @@ private val PausedDot = Color(0xFFF1B736)
 
 class FloatingControlService : Service() {
     private var windowManager: WindowManager? = null
-    private var overlayView: ComposeView? = null
+    private var overlayView: DragContainer? = null
     private var overlayLifecycleOwner: OverlayLifecycleOwner? = null
 
     private lateinit var layoutParams: WindowManager.LayoutParams
@@ -132,21 +133,21 @@ class FloatingControlService : Service() {
                     y = dp(96)
                 }
 
-        overlayView =
+        val composeView =
             ComposeView(this).apply {
-                setViewTreeLifecycleOwner(overlayLifecycleOwner)
-                setViewTreeViewModelStoreOwner(overlayLifecycleOwner)
-                setViewTreeSavedStateRegistryOwner(overlayLifecycleOwner)
-
                 setContent {
                     RecoraTheme(pitchBlackTheme = true) {
                         FloatingPillContent()
                     }
                 }
-
-                setOnTouchListener { _, event ->
-                    handleTouch(event)
-                }
+            }
+        // Compose resolves these owners from the window's root view, which is the container.
+        overlayView =
+            DragContainer(this).apply {
+                setViewTreeLifecycleOwner(overlayLifecycleOwner)
+                setViewTreeViewModelStoreOwner(overlayLifecycleOwner)
+                setViewTreeSavedStateRegistryOwner(overlayLifecycleOwner)
+                addView(composeView)
             }
 
         try {
@@ -182,14 +183,35 @@ class FloatingControlService : Service() {
                 }
             }
 
-            MotionEvent.ACTION_UP -> {
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 if (isDragging) {
+                    isDragging = false
                     snapToEdge()
                     return true
                 }
             }
         }
         return false
+    }
+
+    /**
+     * Compose consumes every touch that lands on the pill, so a listener on the view would never see
+     * the drag. Intercepting once the finger moves past the touch slop lets the buttons keep their
+     * clicks while a drag anywhere on the pill moves the window.
+     */
+    private inner class DragContainer(
+        context: Context,
+    ) : FrameLayout(context) {
+        override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+            handleTouch(ev)
+            return isDragging
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
+        override fun onTouchEvent(event: MotionEvent): Boolean {
+            handleTouch(event)
+            return true
+        }
     }
 
     private fun snapToEdge() {
@@ -235,34 +257,34 @@ class FloatingControlService : Service() {
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
             ) {
                 Box(
                     modifier =
                         Modifier
-                            .size(10.dp)
+                            .size(8.dp)
                             .clip(CircleShape)
                             .background(if (isPaused) PausedDot else RecordingDot),
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
                 Text(
                     text = sessionState.formattedDuration,
                     style = MaterialTheme.typography.titleSmall.copy(fontFeatureSettings = "tnum"),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp,
+                    fontSize = 13.sp,
                     color = OnPill,
                     maxLines = 1,
                     softWrap = false,
                 )
-                Spacer(Modifier.width(12.dp))
+                Spacer(Modifier.width(8.dp))
                 Box(
                     modifier =
                         Modifier
                             .width(1.dp)
-                            .height(26.dp)
+                            .height(20.dp)
                             .background(OnPill.copy(alpha = 0.2f)),
                 )
-                Spacer(Modifier.width(12.dp))
+                Spacer(Modifier.width(8.dp))
 
                 PillButton(
                     icon = if (isPaused) Icons.Rounded.PlayArrow else Icons.Rounded.Pause,
@@ -275,21 +297,21 @@ class FloatingControlService : Service() {
                         }
                     },
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
                 PillButton(
                     icon = Icons.Rounded.PhotoCamera,
                     description = "Facecam",
                     selected = isFacecamActive,
                     onClick = { RecordingController.toggleFacecam(this@FloatingControlService) },
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
                 PillButton(
                     icon = Icons.Rounded.Draw,
                     description = "Bút vẽ",
                     selected = isDrawingActive,
                     onClick = { RecordingController.toggleDrawing(this@FloatingControlService) },
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
                 PillButton(
                     icon = Icons.Rounded.Stop,
                     description = "Dừng",
@@ -311,12 +333,12 @@ class FloatingControlService : Service() {
         tint: Color = OnPill,
     ) {
         // Selected buttons morph from a circle into a rounded square (Material 3 Expressive).
-        val corner by animateDpAsState(if (selected) 14.dp else 22.dp, label = "pillButtonCorner")
+        val corner by animateDpAsState(if (selected) 11.dp else 18.dp, label = "pillButtonCorner")
         Box(
             contentAlignment = Alignment.Center,
             modifier =
                 Modifier
-                    .size(44.dp)
+                    .size(36.dp)
                     .clip(RoundedCornerShape(corner))
                     .background(if (selected) ActiveContainer else container)
                     .clickable(role = Role.Button, onClick = onClick),
@@ -325,7 +347,7 @@ class FloatingControlService : Service() {
                 imageVector = icon,
                 contentDescription = description,
                 tint = if (selected) Color.White else tint,
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(18.dp),
             )
         }
     }
