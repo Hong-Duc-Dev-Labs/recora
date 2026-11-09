@@ -1,5 +1,6 @@
 package labs.hongducdev.recora
 
+import androidx.compose.ui.res.stringResource
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -80,7 +81,7 @@ class MainActivity : ComponentActivity() {
             if (result.resultCode == RESULT_OK && result.data != null) {
                 handleProjectionSuccess(result.resultCode, result.data!!)
             } else {
-                Toast.makeText(this, "Đã hủy cấp quyền quay màn hình", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.projection_cancelled), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -108,7 +109,7 @@ class MainActivity : ComponentActivity() {
                     val tabs =
                         listOf(
                             ShellTab(
-                                title = "Ghi hình",
+                                title = stringResource(R.string.tab_record),
                                 icon = Icons.Rounded.Videocam,
                             ) { contentPadding ->
                                 RecordScreen(
@@ -117,13 +118,13 @@ class MainActivity : ComponentActivity() {
                                 )
                             },
                             ShellTab(
-                                title = "Thư viện",
+                                title = stringResource(R.string.tab_library),
                                 icon = Icons.Rounded.VideoLibrary,
                             ) { contentPadding ->
                                 GalleryScreen(contentPadding = contentPadding)
                             },
                             ShellTab(
-                                title = "Cài đặt",
+                                title = stringResource(R.string.tab_settings),
                                 icon = Icons.Rounded.Settings,
                             ) { contentPadding ->
                                 SettingsScreen(
@@ -279,25 +280,25 @@ private fun OverlayDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Cần quyền hiển thị trên ứng dụng khác",
+                text = stringResource(R.string.overlay_dialog_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
         },
         text = {
             Text(
-                text = "Để hiển thị nút nổi hình viên thuốc và bút vẽ trên màn hình khi quay, Recora cần quyền 'Hiển thị trên các ứng dụng khác'.",
+                text = stringResource(R.string.overlay_dialog_message),
                 style = MaterialTheme.typography.bodyMedium,
             )
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Mở cài đặt", color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(R.string.action_open_settings), color = MaterialTheme.colorScheme.primary)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Bỏ qua")
+                Text(stringResource(R.string.action_skip))
             }
         },
     )

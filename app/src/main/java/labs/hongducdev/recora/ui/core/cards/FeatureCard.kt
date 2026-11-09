@@ -1,5 +1,7 @@
 package labs.hongducdev.recora.ui.core.cards
 
+import labs.hongducdev.recora.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -276,7 +278,7 @@ fun FeatureCard(
         ) {
             if (onPinToggle != null) {
                 SegmentedDropdownMenuItem(
-                    text = { Text(if (isPinned) "Bỏ ghim" else "Ghim lên đầu") },
+                    text = { Text(if (isPinned) stringResource(R.string.unpin) else stringResource(R.string.pin_to_top)) },
                     onClick = {
                         showMenu = false
                         onPinToggle()
@@ -292,7 +294,7 @@ fun FeatureCard(
 
             if (onHelpClick != null) {
                 SegmentedDropdownMenuItem(
-                    text = { Text("Tính năng này là gì?") },
+                    text = { Text(stringResource(R.string.what_is_feature)) },
                     onClick = {
                         showMenu = false
                         onHelpClick()

@@ -1,5 +1,7 @@
 package labs.hongducdev.recora.ui.components
 
+import labs.hongducdev.recora.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -54,7 +56,7 @@ fun FavoriteCarousel(
         modifier = modifier.fillMaxWidth(),
     ) {
         Text(
-            text = "Yêu thích",
+            text = stringResource(R.string.favorites),
             style =
                 MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.SemiBold,

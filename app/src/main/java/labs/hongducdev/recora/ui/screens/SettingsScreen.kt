@@ -1,5 +1,7 @@
 package labs.hongducdev.recora.ui.screens
 
+import labs.hongducdev.recora.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -101,18 +103,18 @@ fun SettingsScreen(
     ) {
         item {
             PullTitleHeader(
-                title = "Cài đặt",
-                caption = "Tùy chỉnh quay & giao diện",
+                title = stringResource(R.string.tab_settings),
+                caption = stringResource(R.string.settings_caption),
                 state = headerState,
             )
         }
 
         // 1. Video Settings
         item {
-            RoundedCardContainer(title = "Chất lượng Video") {
+            RoundedCardContainer(title = stringResource(R.string.video_quality)) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Độ phân giải",
+                        text = stringResource(R.string.resolution),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -135,7 +137,7 @@ fun SettingsScreen(
                     Spacer(Modifier.height(16.dp))
 
                     Text(
-                        text = "Tốc độ khung hình (FPS)",
+                        text = stringResource(R.string.fps_label),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -157,7 +159,7 @@ fun SettingsScreen(
                     Spacer(Modifier.height(16.dp))
 
                     ExpressiveSlider(
-                        label = "Bitrate Video",
+                        label = stringResource(R.string.bitrate_label),
                         value = bitRateMbps,
                         range = 4f..24f,
                         valueFormatted = "${bitRateMbps.toInt()} Mbps",
@@ -172,10 +174,10 @@ fun SettingsScreen(
 
         // 2. Audio Settings
         item {
-            RoundedCardContainer(title = "Âm thanh") {
+            RoundedCardContainer(title = stringResource(R.string.audio)) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Nguồn thu âm",
+                        text = stringResource(R.string.audio_source),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -184,8 +186,8 @@ fun SettingsScreen(
                     SegmentedPicker(
                         items =
                             listOf(
-                                AudioSourceType.MIC to "Micro",
-                                AudioSourceType.MUTE to "Tắt tiếng",
+                                AudioSourceType.MIC to stringResource(R.string.audio_mic),
+                                AudioSourceType.MUTE to stringResource(R.string.audio_mute),
                             ),
                         selectedItem = audioSource,
                         onItemSelected = {
@@ -199,10 +201,10 @@ fun SettingsScreen(
 
         // 3. Controls & Overlay
         item {
-            RoundedCardContainer(title = "Điều khiển") {
+            RoundedCardContainer(title = stringResource(R.string.controls)) {
                 IconToggleItem(
-                    title = "Thanh nổi trên màn hình",
-                    description = "Hiện nút điều khiển hình viên thuốc kèm bút vẽ",
+                    title = stringResource(R.string.floating_bar),
+                    description = stringResource(R.string.floating_bar_desc),
                     icon = Icons.Rounded.Widgets,
                     checked = floatingControls,
                     onCheckedChange = {
@@ -213,7 +215,7 @@ fun SettingsScreen(
 
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Đếm ngược trước khi quay",
+                        text = stringResource(R.string.countdown),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -222,9 +224,9 @@ fun SettingsScreen(
                     SegmentedPicker(
                         items =
                             listOf(
-                                0 to "Không",
-                                3 to "3 giây",
-                                5 to "5 giây",
+                                0 to stringResource(R.string.countdown_none),
+                                3 to stringResource(R.string.countdown_3),
+                                5 to stringResource(R.string.countdown_5),
                             ),
                         selectedItem = countdown,
                         onItemSelected = {
@@ -238,10 +240,10 @@ fun SettingsScreen(
 
         // 4. Appearance & Haptics
         item {
-            RoundedCardContainer(title = "Giao diện & Phản hồi") {
+            RoundedCardContainer(title = stringResource(R.string.appearance)) {
                 IconToggleItem(
-                    title = "Nền đen tuyền (Pitch Black)",
-                    description = "Tối ưu màn hình OLED với màu đen tuyệt đối",
+                    title = stringResource(R.string.pitch_black),
+                    description = stringResource(R.string.pitch_black_desc),
                     icon = Icons.Rounded.DarkMode,
                     checked = pitchBlack,
                     onCheckedChange = {
@@ -252,8 +254,8 @@ fun SettingsScreen(
                 )
 
                 IconToggleItem(
-                    title = "Rung phản hồi (Haptics)",
-                    description = "Rung xúc giác nhẹ trên từng chạm và thao tác",
+                    title = stringResource(R.string.haptics),
+                    description = stringResource(R.string.haptics_desc),
                     icon = Icons.Rounded.Vibration,
                     checked = hapticsEnabled,
                     onCheckedChange = {

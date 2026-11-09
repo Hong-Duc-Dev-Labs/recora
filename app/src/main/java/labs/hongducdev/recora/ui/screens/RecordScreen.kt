@@ -1,5 +1,7 @@
 package labs.hongducdev.recora.ui.screens
 
+import labs.hongducdev.recora.R
+import androidx.compose.ui.res.stringResource
 import android.os.Environment
 import android.os.StatFs
 import androidx.compose.animation.AnimatedVisibility
@@ -128,7 +130,7 @@ fun RecordScreen(
         item {
             PullTitleHeader(
                 title = "Recora",
-                caption = "Quay màn hình mượt mà",
+                caption = stringResource(R.string.record_caption),
                 state = headerState,
             )
         }
@@ -202,7 +204,7 @@ fun RecordScreen(
                                     isPaused -> Icons.Rounded.Pause
                                     else -> Icons.Rounded.Videocam
                                 },
-                            contentDescription = "Thao tác quay",
+                            contentDescription = stringResource(R.string.record_action),
                             tint = Color.White,
                             modifier = Modifier.size(52.dp),
                         )
@@ -213,9 +215,9 @@ fun RecordScreen(
                     Text(
                         text =
                             when {
-                                isRecording -> "Đang quay: ${sessionState.formattedDuration}"
-                                isPaused -> "Đang tạm dừng (${sessionState.formattedDuration})"
-                                else -> "Sẵn sàng quay màn hình"
+                                isRecording -> stringResource(R.string.record_status_recording, sessionState.formattedDuration)
+                                isPaused -> stringResource(R.string.record_status_paused, sessionState.formattedDuration)
+                                else -> stringResource(R.string.record_status_ready)
                             },
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
@@ -227,9 +229,9 @@ fun RecordScreen(
                     Text(
                         text =
                             when {
-                                isRecording -> "Chạm vào nút để dừng và lưu video"
-                                isPaused -> "Chạm thanh nổi để tiếp tục"
-                                else -> "${config.resolutionWidth}x${config.resolutionHeight} • ${config.frameRate} FPS • Trống ${storageFreeGb}GB"
+                                isRecording -> stringResource(R.string.record_hint_recording)
+                                isPaused -> stringResource(R.string.record_hint_paused)
+                                else -> stringResource(R.string.record_hint_idle, config.resolutionWidth, config.resolutionHeight, config.frameRate, storageFreeGb)
                             },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -240,10 +242,10 @@ fun RecordScreen(
 
         // Quick Toggles
         item {
-            RoundedCardContainer(title = "Điều khiển nhanh") {
+            RoundedCardContainer(title = stringResource(R.string.quick_controls)) {
                 IconToggleItem(
-                    title = "Thu âm qua Mic",
-                    description = if (micEnabled) "Đang bật micro thu tiếng nói" else "Tắt micro",
+                    title = stringResource(R.string.mic_title),
+                    description = if (micEnabled) stringResource(R.string.mic_on) else stringResource(R.string.mic_off),
                     icon = Icons.Rounded.Mic,
                     checked = micEnabled,
                     onCheckedChange = { checked ->
@@ -257,8 +259,8 @@ fun RecordScreen(
                 )
 
                 IconToggleItem(
-                    title = "Nút nổi trên màn hình",
-                    description = "Thanh điều khiển hình viên thuốc kèm bút vẽ",
+                    title = stringResource(R.string.float_title),
+                    description = stringResource(R.string.float_desc),
                     icon = Icons.Rounded.Widgets,
                     checked = floatingControlsEnabled,
                     onCheckedChange = { checked ->

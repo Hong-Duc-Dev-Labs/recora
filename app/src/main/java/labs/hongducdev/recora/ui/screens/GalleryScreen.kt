@@ -1,5 +1,8 @@
 package labs.hongducdev.recora.ui.screens
 
+import labs.hongducdev.recora.R
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import android.net.Uri
 import android.util.Size
 import android.widget.Toast
@@ -125,8 +128,8 @@ fun GalleryScreen(
     ) {
         item {
             PullTitleHeader(
-                title = "Thư viện",
-                caption = "${videos.size} video đã quay",
+                title = stringResource(R.string.tab_library),
+                caption = pluralStringResource(R.plurals.gallery_count, videos.size, videos.size),
                 state = headerState,
             )
         }
@@ -167,7 +170,7 @@ fun GalleryScreen(
                         Spacer(Modifier.height(16.dp))
 
                         Text(
-                            text = "Chưa có video nào",
+                            text = stringResource(R.string.gallery_empty_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -176,7 +179,7 @@ fun GalleryScreen(
                         Spacer(Modifier.height(4.dp))
 
                         Text(
-                            text = "Bắt đầu quay màn hình để lưu lại video đầu tiên của bạn",
+                            text = stringResource(R.string.gallery_empty_message),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -193,14 +196,14 @@ fun GalleryScreen(
                         try {
                             context.startActivity(storageManager.createPlayIntent(video.uri))
                         } catch (_: Exception) {
-                            Toast.makeText(context, "Không tìm thấy app phát video", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.no_player), Toast.LENGTH_SHORT).show()
                         }
                     },
                     onShare = {
                         try {
                             context.startActivity(storageManager.createShareIntent(video.uri))
                         } catch (_: Exception) {
-                            Toast.makeText(context, "Không thể chia sẻ video", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.share_failed), Toast.LENGTH_SHORT).show()
                         }
                     },
                     onDelete = {
@@ -217,14 +220,14 @@ fun GalleryScreen(
             onDismissRequest = { videoToDelete = null },
             title = {
                 Text(
-                    text = "Xoá video?",
+                    text = stringResource(R.string.delete_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                 )
             },
             text = {
                 Text(
-                    text = "Bạn có chắc chắn muốn xoá video '${video.displayName}' không? Thao tác này không thể hoàn tác.",
+                    text = stringResource(R.string.delete_message, video.displayName),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
@@ -233,18 +236,18 @@ fun GalleryScreen(
                     onClick = {
                         val deleted = storageManager.deleteVideo(video.uri)
                         if (deleted) {
-                            Toast.makeText(context, "Đã xoá video", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.deleted), Toast.LENGTH_SHORT).show()
                             refreshVideos()
                         }
                         videoToDelete = null
                     },
                 ) {
-                    Text("Xoá", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.action_delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { videoToDelete = null }) {
-                    Text("Huỷ")
+                    Text(stringResource(R.string.action_cancel))
                 }
             },
         )
@@ -288,7 +291,7 @@ private fun VideoCardItem(
             Spacer(Modifier.weight(1f))
             SwipeAction(
                 icon = Icons.Rounded.Share,
-                description = "Chia sẻ",
+                description = stringResource(R.string.action_share),
                 container = MaterialTheme.colorScheme.secondaryContainer,
                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
                 onClick = {
@@ -298,7 +301,7 @@ private fun VideoCardItem(
             )
             SwipeAction(
                 icon = Icons.Rounded.Delete,
-                description = "Xoá",
+                description = stringResource(R.string.action_delete),
                 container = MaterialTheme.colorScheme.errorContainer,
                 tint = MaterialTheme.colorScheme.onErrorContainer,
                 onClick = {
@@ -446,7 +449,7 @@ private fun VideoThumbnail(uri: Uri) {
         ) {
             Icon(
                 imageVector = Icons.Rounded.PlayArrow,
-                contentDescription = "Phát video",
+                contentDescription = stringResource(R.string.action_play),
                 tint = if (thumbnail != null) Color.White else MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp),
             )

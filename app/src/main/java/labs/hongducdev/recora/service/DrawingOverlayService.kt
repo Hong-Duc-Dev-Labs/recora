@@ -1,5 +1,7 @@
 package labs.hongducdev.recora.service
 
+import labs.hongducdev.recora.R
+import androidx.compose.ui.res.stringResource
 import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
@@ -240,7 +242,7 @@ class DrawingOverlayService : Service() {
                 IconButton(onClick = onUndo, modifier = Modifier.size(34.dp)) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.Undo,
-                        contentDescription = "Hoàn tác",
+                        contentDescription = stringResource(R.string.action_undo),
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(20.dp),
                     )
@@ -250,7 +252,7 @@ class DrawingOverlayService : Service() {
                 IconButton(onClick = onClear, modifier = Modifier.size(34.dp)) {
                     Icon(
                         imageVector = Icons.Rounded.DeleteSweep,
-                        contentDescription = "Xóa hết",
+                        contentDescription = stringResource(R.string.action_clear_all),
                         tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(20.dp),
                     )
@@ -269,7 +271,7 @@ class DrawingOverlayService : Service() {
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Check,
-                        contentDescription = "Xong",
+                        contentDescription = stringResource(R.string.action_done),
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(20.dp),
                     )

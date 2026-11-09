@@ -1,5 +1,7 @@
 package labs.hongducdev.recora.ui.components
 
+import labs.hongducdev.recora.R
+import androidx.compose.ui.res.stringResource
 import android.os.Build
 import android.os.Environment
 import android.os.StatFs
@@ -140,8 +142,8 @@ fun DeviceHeroCard(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
             horizontalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            SpecTile("Hệ điều hành", androidVersion, Icons.Rounded.Android, "Android", Modifier.weight(1f).fillMaxHeight())
-            SpecTile("Bộ nhớ trong", storageInfo, Icons.Rounded.SdStorage, "Storage", Modifier.weight(1f).fillMaxHeight())
+            SpecTile(stringResource(R.string.spec_os), androidVersion, Icons.Rounded.Android, "Android", Modifier.weight(1f).fillMaxHeight())
+            SpecTile(stringResource(R.string.spec_storage), storageInfo, Icons.Rounded.SdStorage, "Storage", Modifier.weight(1f).fillMaxHeight())
         }
     }
 }

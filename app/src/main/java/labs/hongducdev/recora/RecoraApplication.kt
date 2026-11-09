@@ -16,10 +16,10 @@ class RecoraApplication : Application() {
             val recordingChannel =
                 NotificationChannel(
                     CHANNEL_RECORDING,
-                    "Screen Recording",
+                    getString(R.string.channel_name),
                     NotificationManager.IMPORTANCE_LOW,
                 ).apply {
-                    description = "Notifications while screen recording is active"
+                    description = getString(R.string.channel_description)
                     setShowBadge(false)
                 }
 

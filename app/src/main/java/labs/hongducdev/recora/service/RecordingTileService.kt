@@ -83,20 +83,20 @@ class RecordingTileService : TileService() {
         when (state.status) {
             RecordingStatus.RECORDING -> {
                 tile.state = Tile.STATE_ACTIVE
-                tile.label = "Đang quay"
+                tile.label = getString(R.string.tile_recording)
                 tile.subtitle = state.formattedDuration
             }
 
             RecordingStatus.PAUSED -> {
                 tile.state = Tile.STATE_ACTIVE
-                tile.label = "Tạm dừng"
+                tile.label = getString(R.string.tile_paused)
                 tile.subtitle = state.formattedDuration
             }
 
             else -> {
                 tile.state = Tile.STATE_INACTIVE
-                tile.label = "Quay màn hình"
-                tile.subtitle = "Chạm để bắt đầu"
+                tile.label = getString(R.string.tile_label)
+                tile.subtitle = getString(R.string.tile_start_hint)
             }
         }
         tile.updateTile()

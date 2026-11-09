@@ -1,5 +1,7 @@
 package labs.hongducdev.recora.service
 
+import labs.hongducdev.recora.R
+import androidx.compose.ui.res.stringResource
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Service
@@ -288,7 +290,7 @@ class FloatingControlService : Service() {
 
                 PillButton(
                     icon = if (isPaused) Icons.Rounded.PlayArrow else Icons.Rounded.Pause,
-                    description = if (isPaused) "Tiếp tục" else "Tạm dừng",
+                    description = if (isPaused) stringResource(R.string.action_resume) else stringResource(R.string.action_pause),
                     onClick = {
                         if (isPaused) {
                             RecordingController.resumeRecording(this@FloatingControlService)
@@ -307,14 +309,14 @@ class FloatingControlService : Service() {
                 Spacer(Modifier.width(6.dp))
                 PillButton(
                     icon = Icons.Rounded.Draw,
-                    description = "Bút vẽ",
+                    description = stringResource(R.string.action_draw),
                     selected = isDrawingActive,
                     onClick = { RecordingController.toggleDrawing(this@FloatingControlService) },
                 )
                 Spacer(Modifier.width(6.dp))
                 PillButton(
                     icon = Icons.Rounded.Stop,
-                    description = "Dừng",
+                    description = stringResource(R.string.action_stop),
                     container = StopContainer,
                     tint = Color.White,
                     onClick = { RecordingController.stopRecording(this@FloatingControlService) },

@@ -337,7 +337,7 @@ class ScreenRecordingService : Service() {
                 NotificationCompat.Action
                     .Builder(
                         android.R.drawable.ic_media_play,
-                        "Tiếp tục",
+                        getString(R.string.action_resume),
                         resumePendingIntent,
                     ).build()
             } else {
@@ -355,7 +355,7 @@ class ScreenRecordingService : Service() {
                 NotificationCompat.Action
                     .Builder(
                         android.R.drawable.ic_media_pause,
-                        "Tạm dừng",
+                        getString(R.string.action_pause),
                         pausePendingIntent,
                     ).build()
             }
@@ -363,15 +363,15 @@ class ScreenRecordingService : Service() {
         val notification =
             NotificationCompat
                 .Builder(this, RecoraApplication.CHANNEL_RECORDING)
-                .setContentTitle("Đang quay màn hình [$timeText]")
-                .setContentText(if (isPaused) "Đang tạm dừng" else "Chạm để mở ứng dụng Recora")
+                .setContentTitle(getString(R.string.notification_title, timeText))
+                .setContentText(getString(if (isPaused) R.string.notification_text_paused else R.string.notification_text_tap))
                 .setSmallIcon(android.R.drawable.ic_menu_camera)
                 .setContentIntent(appPendingIntent)
                 .setOngoing(true)
                 .addAction(pauseResumeAction)
                 .addAction(
                     android.R.drawable.ic_media_next,
-                    "Dừng",
+                    getString(R.string.action_stop),
                     stopPendingIntent,
                 ).build()
 

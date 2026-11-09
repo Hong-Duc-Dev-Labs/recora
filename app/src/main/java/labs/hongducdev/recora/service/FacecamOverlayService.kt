@@ -1,5 +1,7 @@
 package labs.hongducdev.recora.service
 
+import labs.hongducdev.recora.R
+import androidx.compose.ui.res.stringResource
 import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
@@ -168,7 +170,7 @@ class FacecamOverlayService : Service() {
                             ) {
                                 Icon(
                                     imageVector = Icons.Rounded.Close,
-                                    contentDescription = "Đóng",
+                                    contentDescription = stringResource(R.string.action_close),
                                     tint = Color.White,
                                     modifier = Modifier.size(16.dp),
                                 )

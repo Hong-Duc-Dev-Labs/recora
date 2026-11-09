@@ -40,7 +40,7 @@ class RecordingStartActivity : ComponentActivity() {
             if (result.resultCode == RESULT_OK && data != null) {
                 runCountdownThenStart(result.resultCode, data)
             } else {
-                Toast.makeText(this, "Đã hủy cấp quyền quay màn hình", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.projection_cancelled), Toast.LENGTH_SHORT).show()
                 close()
             }
         }
@@ -79,7 +79,7 @@ class RecordingStartActivity : ComponentActivity() {
         }
 
         if (prefManager.enableFloatingControls && !Settings.canDrawOverlays(this)) {
-            Toast.makeText(this, "Chưa cấp quyền hiển thị trên ứng dụng khác nên sẽ không có thanh điều khiển nổi", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.overlay_missing_toast), Toast.LENGTH_LONG).show()
         }
 
         if (missing.isNotEmpty()) permissionsLauncher.launch(missing.toTypedArray()) else requestProjection()
@@ -99,7 +99,7 @@ class RecordingStartActivity : ComponentActivity() {
     private fun resolveConfig(): RecordingConfig {
         val config = prefManager.getRecordingConfig()
         if (usesMic(config.audioSource) && !isGranted(Manifest.permission.RECORD_AUDIO)) {
-            Toast.makeText(this, "Chưa cấp quyền micro nên video sẽ không có tiếng", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.mic_missing_toast), Toast.LENGTH_LONG).show()
             return config.copy(audioSource = AudioSourceType.MUTE)
         }
         return config
@@ -122,7 +122,7 @@ class RecordingStartActivity : ComponentActivity() {
             // A foreground service of type mediaProjection cannot be started safely from the
             // background, so if the user left during the countdown the start is cancelled.
             if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-                Toast.makeText(this@RecordingStartActivity, "Đã hủy quay vì bạn rời khỏi màn hình", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@RecordingStartActivity, getString(R.string.start_cancelled_left), Toast.LENGTH_SHORT).show()
                 close()
                 return@launch
             }

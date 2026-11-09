@@ -1,5 +1,7 @@
 package labs.hongducdev.recora.ui.components
 
+import labs.hongducdev.recora.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.fillMaxSize
@@ -130,7 +132,7 @@ fun EssentialsFloatingToolbar(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.HelpOutline,
-                            contentDescription = "Trợ giúp",
+                            contentDescription = stringResource(R.string.action_help),
                         )
                     }
                 }
@@ -205,7 +207,7 @@ fun EssentialsFloatingToolbar(
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                                    contentDescription = "Quay lại",
+                                    contentDescription = stringResource(R.string.action_back),
                                     modifier = Modifier.size(24.dp),
                                 )
                             }

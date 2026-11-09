@@ -1,5 +1,7 @@
 package labs.hongducdev.recora.ui.core.sliders
 
+import labs.hongducdev.recora.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -104,7 +106,7 @@ fun ExpressiveSlider(
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Remove,
-                    contentDescription = "Giảm",
+                    contentDescription = stringResource(R.string.action_decrease),
                     modifier = Modifier.size(18.dp),
                 )
             }
@@ -148,7 +150,7 @@ fun ExpressiveSlider(
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Add,
-                    contentDescription = "Tăng",
+                    contentDescription = stringResource(R.string.action_increase),
                     modifier = Modifier.size(18.dp),
                 )
             }
