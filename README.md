@@ -32,3 +32,7 @@ and "display over other apps" for the floating bar.
 ## More
 
 Why the code is shaped the way it is: [docs/system-architecture.md](docs/system-architecture.md).
+
+## License
+
+[MIT](LICENSE)
