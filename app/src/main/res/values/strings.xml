@@ -30,6 +30,10 @@
     <string name="notification_text_tap">Tap to open Recora</string>
     <string name="channel_name">Screen Recording</string>
     <string name="channel_description">Notifications while screen recording is active</string>
+    <string name="channel_saved_name">Saved videos</string>
+    <string name="channel_saved_description">Tells you when a recording has been saved</string>
+    <string name="notification_saved_title">Video saved</string>
+    <string name="notification_saved_text">Tap to watch it</string>
     <string name="spec_os">Operating system</string>
     <string name="spec_storage">Internal storage</string>
     <string name="action_help">Help</string>

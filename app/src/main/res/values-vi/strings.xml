@@ -29,6 +29,10 @@
     <string name="notification_text_paused">Đang tạm dừng</string>
     <string name="notification_text_tap">Chạm để mở ứng dụng Recora</string>
     <string name="channel_name">Quay màn hình</string>
+    <string name="channel_saved_name">Video đã lưu</string>
+    <string name="channel_saved_description">Báo cho bạn khi một video đã được lưu xong</string>
+    <string name="notification_saved_title">Đã lưu video</string>
+    <string name="notification_saved_text">Chạm để xem video</string>
     <string name="channel_description">Thông báo khi đang quay màn hình</string>
     <string name="spec_os">Hệ điều hành</string>
     <string name="spec_storage">Bộ nhớ trong</string>

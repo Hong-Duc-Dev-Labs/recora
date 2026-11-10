@@ -1,5 +1,6 @@
 package labs.hongducdev.recora.service
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
@@ -17,9 +18,10 @@ import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.util.DisplayMetrics
 import android.view.Surface
-import android.widget.Toast
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -250,15 +252,18 @@ class ScreenRecordingService : Service() {
     private fun stopRecording() {
         timerJob?.cancel()
 
+        var saved = false
         try {
             mediaRecorder?.stop()
+            saved = mediaRecorder != null
         } catch (_: Exception) {
             // Ignore if recording was too short
         }
-        codecRecorder?.stop()
+        codecRecorder?.let { saved = it.stop() }
 
         outputUri?.let { uri ->
             storageManager.completeVideoOutputUri(uri)
+            if (saved) showSavedNotification(uri)
         }
 
         RecordingController.updateSessionState(
@@ -277,6 +282,30 @@ class ScreenRecordingService : Service() {
         cleanup()
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun showSavedNotification(uri: Uri) {
+        val manager = NotificationManagerCompat.from(this)
+        if (!manager.areNotificationsEnabled()) return
+
+        val watchPendingIntent =
+            PendingIntent.getActivity(
+                this,
+                4,
+                storageManager.createPlayIntent(uri),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        val notification =
+            NotificationCompat
+                .Builder(this, RecoraApplication.CHANNEL_SAVED)
+                .setContentTitle(getString(R.string.notification_saved_title))
+                .setContentText(getString(R.string.notification_saved_text))
+                .setSmallIcon(android.R.drawable.ic_menu_camera)
+                .setContentIntent(watchPendingIntent)
+                .setAutoCancel(true)
+                .build()
+        manager.notify(SAVED_NOTIFICATION_ID, notification)
     }
 
     private fun cleanup() {
@@ -427,5 +456,6 @@ class ScreenRecordingService : Service() {
         const val EXTRA_DATA = "extra_data"
 
         const val NOTIFICATION_ID = 1001
+        const val SAVED_NOTIFICATION_ID = 1002
     }
 }

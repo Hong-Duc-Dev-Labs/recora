@@ -167,9 +167,12 @@ class CodecScreenRecorder(
         }
     }
 
-    /** Finishes the file and frees every codec and recorder. Safe to call more than once. */
-    fun stop() {
-        if (stopped) return
+    /**
+     * Finishes the file and frees every codec and recorder. Safe to call more than once.
+     * Returns true only when this call produced a complete, playable file.
+     */
+    fun stop(): Boolean {
+        if (stopped) return false
         stopped = true
         running = false
 
@@ -177,12 +180,14 @@ class CodecScreenRecorder(
         runCatching { videoEncoder?.signalEndOfInputStream() }
         videoThread?.join(JOIN_TIMEOUT_MS)
 
-        synchronized(muxLock) {
-            if (muxerStarted) runCatching { muxer?.stop() }
-            runCatching { muxer?.release() }
-            muxer = null
-            pending.clear()
-        }
+        val saved =
+            synchronized(muxLock) {
+                val finished = muxerStarted && runCatching { muxer?.stop() }.isSuccess
+                runCatching { muxer?.release() }
+                muxer = null
+                pending.clear()
+                finished
+            }
 
         runCatching { internalRecord?.stop() }
         runCatching { internalRecord?.release() }
@@ -193,6 +198,7 @@ class CodecScreenRecorder(
         runCatching { videoEncoder?.stop() }
         runCatching { videoEncoder?.release() }
         runCatching { inputSurface.release() }
+        return saved
     }
 
     private fun videoLoop() {

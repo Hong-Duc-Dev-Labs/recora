@@ -23,12 +23,23 @@ class RecoraApplication : Application() {
                     setShowBadge(false)
                 }
 
+            val savedChannel =
+                NotificationChannel(
+                    CHANNEL_SAVED,
+                    getString(R.string.channel_saved_name),
+                    NotificationManager.IMPORTANCE_DEFAULT,
+                ).apply {
+                    description = getString(R.string.channel_saved_description)
+                }
+
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(recordingChannel)
+            manager.createNotificationChannel(savedChannel)
         }
     }
 
     companion object {
         const val CHANNEL_RECORDING = "recora_recording_channel"
+        const val CHANNEL_SAVED = "recora_saved_channel"
     }
 }
