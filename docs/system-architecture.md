@@ -19,11 +19,14 @@ Paths are relative to `app/src/main/java/labs/hongducdev/recora/`.
 
 ## Decisions
 
-**Recording uses `MediaRecorder`, not `MediaCodec` plus `MediaMuxer`.** It is far less code and enough for
-screen plus microphone. The cost is that the audio source is fixed when recording starts, so there is no
-mid-recording mute and no capture of the device's internal audio. A comparison with another open-source
-recorder that does both is in `plans/reports/xia-261109-2230-screen-recorder-comparison.md`. Add the
-`MediaCodec` path only if those two features are wanted, because it replaces the recording core.
+**There are two recording engines, chosen by the audio source.** `MediaRecorder` handles microphone-only and
+silent recordings because it is far less code. It cannot capture the device's internal audio, so any source
+that includes system audio switches to `CodecScreenRecorder` (`MediaCodec` plus `MediaMuxer`), which mixes
+`AudioPlaybackCapture` with the optional microphone into one AAC track. Pause on that path drops samples
+and shifts later timestamps by the paused time, because a codec has no pause. The audio source is still
+fixed when recording starts, so there is no mid-recording mute. Capturing system audio also needs the
+`RECORD_AUDIO` permission, and apps that opt out of playback capture stay silent. A comparison with another
+open-source recorder is in `plans/reports/xia-261109-2230-screen-recorder-comparison.md`.
 
 **State is a process-wide singleton, not persisted.** `RecordingController` holds `StateFlow`s that the
 services and Compose UI observe. This works because every component runs in one process. A recording that

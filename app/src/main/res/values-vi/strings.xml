@@ -10,6 +10,7 @@
     <string name="action_open_settings">Mở cài đặt</string>
     <string name="action_skip">Bỏ qua</string>
     <string name="overlay_missing_toast">Chưa cấp quyền hiển thị trên ứng dụng khác nên sẽ không có thanh điều khiển nổi</string>
+    <string name="recording_failed_toast">Không bắt đầu ghi được. Thiết bị có thể không hỗ trợ nguồn âm thanh đã chọn</string>
     <string name="mic_missing_toast">Chưa cấp quyền micro nên video sẽ không có tiếng</string>
     <string name="start_cancelled_left">Đã hủy quay vì bạn rời khỏi màn hình</string>
     <string name="action_undo">Hoàn tác</string>
@@ -70,9 +71,13 @@
     <string name="fps_label">Tốc độ khung hình (FPS)</string>
     <string name="bitrate_label">Bitrate Video</string>
     <string name="audio">Âm thanh</string>
-    <string name="audio_source">Nguồn thu âm</string>
     <string name="audio_mic">Micro</string>
-    <string name="audio_mute">Tắt tiếng</string>
+    <string name="audio_mic_desc">Thu giọng nói của bạn</string>
+    <string name="audio_system">Âm thanh hệ thống</string>
+    <string name="audio_system_desc">Thu tiếng đang phát trong máy. Một số ứng dụng chặn việc này. Tắt cả hai để quay không tiếng</string>
+    <string name="system_audio_title">Thu âm thanh hệ thống</string>
+    <string name="system_audio_on">Đang thu tiếng phát ra từ máy</string>
+    <string name="system_audio_off">Tắt âm thanh hệ thống</string>
     <string name="controls">Điều khiển</string>
     <string name="floating_bar">Thanh nổi trên màn hình</string>
     <string name="floating_bar_desc">Hiện nút điều khiển hình viên thuốc kèm bút vẽ</string>

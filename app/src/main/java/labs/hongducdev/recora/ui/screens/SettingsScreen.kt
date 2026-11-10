@@ -175,27 +175,26 @@ fun SettingsScreen(
         // 2. Audio Settings
         item {
             RoundedCardContainer(title = stringResource(R.string.audio)) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = stringResource(R.string.audio_source),
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    SegmentedPicker(
-                        items =
-                            listOf(
-                                AudioSourceType.MIC to stringResource(R.string.audio_mic),
-                                AudioSourceType.MUTE to stringResource(R.string.audio_mute),
-                            ),
-                        selectedItem = audioSource,
-                        onItemSelected = {
-                            audioSource = it
-                            updateConfig()
-                        },
-                    )
-                }
+                IconToggleItem(
+                    title = stringResource(R.string.audio_mic),
+                    description = stringResource(R.string.audio_mic_desc),
+                    icon = Icons.Rounded.Mic,
+                    checked = audioSource.hasMic,
+                    onCheckedChange = {
+                        audioSource = AudioSourceType.from(mic = it, internal = audioSource.hasInternal)
+                        updateConfig()
+                    },
+                )
+                IconToggleItem(
+                    title = stringResource(R.string.audio_system),
+                    description = stringResource(R.string.audio_system_desc),
+                    icon = Icons.Rounded.GraphicEq,
+                    checked = audioSource.hasInternal,
+                    onCheckedChange = {
+                        audioSource = AudioSourceType.from(mic = audioSource.hasMic, internal = it)
+                        updateConfig()
+                    },
+                )
             }
         }
 

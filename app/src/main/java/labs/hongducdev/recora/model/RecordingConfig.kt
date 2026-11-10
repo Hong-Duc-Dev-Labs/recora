@@ -5,6 +5,22 @@ enum class AudioSourceType {
     MIC,
     INTERNAL,
     MIC_AND_INTERNAL,
+    ;
+
+    val hasMic: Boolean get() = this == MIC || this == MIC_AND_INTERNAL
+    val hasInternal: Boolean get() = this == INTERNAL || this == MIC_AND_INTERNAL
+
+    companion object {
+        fun from(
+            mic: Boolean,
+            internal: Boolean,
+        ) = when {
+            mic && internal -> MIC_AND_INTERNAL
+            mic -> MIC
+            internal -> INTERNAL
+            else -> MUTE
+        }
+    }
 }
 
 data class VideoResolution(

@@ -16,6 +16,8 @@ import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.util.DisplayMetrics
+import android.view.Surface
+import android.widget.Toast
 import android.view.WindowManager
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.CoroutineScope
@@ -41,6 +43,7 @@ class ScreenRecordingService : Service() {
     private var mediaProjection: MediaProjection? = null
     private var virtualDisplay: VirtualDisplay? = null
     private var mediaRecorder: MediaRecorder? = null
+    private var codecRecorder: CodecScreenRecorder? = null
     private var outputUri: Uri? = null
     private var pfd: ParcelFileDescriptor? = null
 
@@ -111,10 +114,18 @@ class ScreenRecordingService : Service() {
                 return
             }
 
-            setupMediaRecorder(config, pfd!!)
-            setupVirtualDisplay(config)
-
-            mediaRecorder?.start()
+            if (config.audioSource.hasInternal) {
+                // MediaRecorder cannot capture the device's own audio, so this path muxes it itself.
+                val recorder = CodecScreenRecorder(config, mediaProjection!!, pfd!!.fileDescriptor)
+                recorder.prepare()
+                codecRecorder = recorder
+                setupVirtualDisplay(config, recorder.inputSurface)
+                recorder.start()
+            } else {
+                setupMediaRecorder(config, pfd!!)
+                setupVirtualDisplay(config, mediaRecorder?.surface)
+                mediaRecorder?.start()
+            }
 
             durationSeconds = 0
             RecordingController.updateSessionState(
@@ -133,6 +144,7 @@ class ScreenRecordingService : Service() {
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            Toast.makeText(this, getString(R.string.recording_failed_toast), Toast.LENGTH_LONG).show()
             cleanup()
             stopSelf()
         }
@@ -173,7 +185,10 @@ class ScreenRecordingService : Service() {
         mediaRecorder = recorder
     }
 
-    private fun setupVirtualDisplay(config: RecordingConfig) {
+    private fun setupVirtualDisplay(
+        config: RecordingConfig,
+        surface: Surface?,
+    ) {
         val wm = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val metrics = DisplayMetrics()
         @Suppress("DEPRECATION")
@@ -196,7 +211,7 @@ class ScreenRecordingService : Service() {
                 config.resolutionHeight,
                 metrics.densityDpi,
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-                mediaRecorder?.surface,
+                surface,
                 null,
                 null,
             )
@@ -206,6 +221,7 @@ class ScreenRecordingService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             try {
                 mediaRecorder?.pause()
+                codecRecorder?.pause()
                 timerJob?.cancel()
                 val current = RecordingController.sessionState.value
                 RecordingController.updateSessionState(current.copy(status = RecordingStatus.PAUSED))
@@ -220,6 +236,7 @@ class ScreenRecordingService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             try {
                 mediaRecorder?.resume()
+                codecRecorder?.resume()
                 val current = RecordingController.sessionState.value
                 RecordingController.updateSessionState(current.copy(status = RecordingStatus.RECORDING))
                 startForegroundNotification(current.formattedDuration, isPaused = false)
@@ -238,6 +255,7 @@ class ScreenRecordingService : Service() {
         } catch (_: Exception) {
             // Ignore if recording was too short
         }
+        codecRecorder?.stop()
 
         outputUri?.let { uri ->
             storageManager.completeVideoOutputUri(uri)
@@ -268,6 +286,9 @@ class ScreenRecordingService : Service() {
         } catch (_: Exception) {
         }
         mediaRecorder = null
+
+        codecRecorder?.stop()
+        codecRecorder = null
 
         virtualDisplay?.release()
         virtualDisplay = null
@@ -378,11 +399,11 @@ class ScreenRecordingService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             // Without the microphone type Android silences mic capture once the app is in the background.
             val config = RecordingController.config.value
-            val usesMic = config.audioSource == AudioSourceType.MIC || config.audioSource == AudioSourceType.MIC_AND_INTERNAL
+            val usesAudio = config.audioSource != AudioSourceType.MUTE
             val micGranted =
                 checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED
             var type = ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
-            if (usesMic && micGranted) type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+            if (usesAudio && micGranted) type = type or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
             startForeground(NOTIFICATION_ID, notification, type)
         } else {
             startForeground(NOTIFICATION_ID, notification)

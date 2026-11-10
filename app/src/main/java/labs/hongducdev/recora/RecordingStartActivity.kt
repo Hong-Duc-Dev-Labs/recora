@@ -85,7 +85,8 @@ class RecordingStartActivity : ComponentActivity() {
         if (missing.isNotEmpty()) permissionsLauncher.launch(missing.toTypedArray()) else requestProjection()
     }
 
-    private fun usesMic(source: AudioSourceType) = source == AudioSourceType.MIC || source == AudioSourceType.MIC_AND_INTERNAL
+    // Capturing the device's own audio needs the microphone permission as well.
+    private fun usesMic(source: AudioSourceType) = source != AudioSourceType.MUTE
 
     private fun isGranted(permission: String) =
         ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED

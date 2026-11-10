@@ -37,6 +37,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CameraFront
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -93,7 +94,16 @@ fun RecordScreen(
     val config by RecordingController.config.collectAsState()
 
     var micEnabled by remember {
-        mutableStateOf(prefManager.audioSource == AudioSourceType.MIC)
+        mutableStateOf(prefManager.audioSource.hasMic)
+    }
+    var systemAudioEnabled by remember {
+        mutableStateOf(prefManager.audioSource.hasInternal)
+    }
+
+    fun applyAudioSource() {
+        val source = AudioSourceType.from(mic = micEnabled, internal = systemAudioEnabled)
+        prefManager.audioSource = source
+        RecordingController.updateConfig(RecordingController.config.value.copy(audioSource = source))
     }
     var floatingControlsEnabled by remember {
         mutableStateOf(prefManager.enableFloatingControls)
@@ -250,11 +260,18 @@ fun RecordScreen(
                     checked = micEnabled,
                     onCheckedChange = { checked ->
                         micEnabled = checked
-                        val newSource = if (checked) AudioSourceType.MIC else AudioSourceType.MUTE
-                        prefManager.audioSource = newSource
-                        RecordingController.updateConfig(
-                            RecordingController.config.value.copy(audioSource = newSource),
-                        )
+                        applyAudioSource()
+                    },
+                )
+
+                IconToggleItem(
+                    title = stringResource(R.string.system_audio_title),
+                    description = if (systemAudioEnabled) stringResource(R.string.system_audio_on) else stringResource(R.string.system_audio_off),
+                    icon = Icons.Rounded.GraphicEq,
+                    checked = systemAudioEnabled,
+                    onCheckedChange = { checked ->
+                        systemAudioEnabled = checked
+                        applyAudioSource()
                     },
                 )
 

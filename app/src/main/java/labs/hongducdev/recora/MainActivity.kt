@@ -172,7 +172,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        if (prefManager.audioSource == AudioSourceType.MIC) {
+        if (prefManager.audioSource != AudioSourceType.MUTE) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED
             ) {
@@ -203,7 +203,14 @@ class MainActivity : ComponentActivity() {
         resultCode: Int,
         data: Intent,
     ) {
-        val config = prefManager.getRecordingConfig()
+        var config = prefManager.getRecordingConfig()
+        // Without microphone access neither the mic nor system audio can be captured, so record without sound.
+        if (config.audioSource != AudioSourceType.MUTE &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
+        ) {
+            android.widget.Toast.makeText(this, getString(R.string.mic_missing_toast), android.widget.Toast.LENGTH_LONG).show()
+            config = config.copy(audioSource = AudioSourceType.MUTE)
+        }
         val countdown = config.countdownSeconds
 
         if (countdown > 0) {
